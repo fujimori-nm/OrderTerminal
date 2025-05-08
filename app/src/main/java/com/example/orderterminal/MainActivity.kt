@@ -39,11 +39,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+//import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.orderterminal.ui.theme.OrderTerminalTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
 //            OrderMenu()
             ScaffoldExample()
@@ -53,11 +59,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun OrderMenu() {
+fun OrderMenu(
+    presses: Int,
+    ) {
+//    var presses by remember { mutableIntStateOf(0) }
+    var showDialog by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf("Result") }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(56.dp),
-        modifier = Modifier.padding(24.dp)
+//            modifier = Modifier.padding(innerPadding),
+        modifier = Modifier.padding(
+            horizontal = 24.dp,
+            vertical = 80.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -86,107 +100,19 @@ fun OrderMenu() {
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = {}, contentPadding = PaddingValues(8.dp)
+            onClick = {showDialog = true},
+            contentPadding = PaddingValues(8.dp)
         ) {
             Text(text = "マスターデータ受信", fontSize = 24.sp)
         }
-    }
-}
 
-
-@Preview(showBackground = true)
-@Composable
-fun OrderMenuPreview() {
-    OrderMenu()
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ScaffoldExample() {
-    var presses by remember { mutableIntStateOf(0) }
-    var showDialog by remember { mutableStateOf(false) }
-    var result by remember { mutableStateOf("Result") }
-
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("商品管理アプリ")
-                }
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Bottom app bar",
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        }
-    ) {  innerPadding ->
-        Column(
-//            modifier = Modifier.padding(innerPadding),
-            modifier = Modifier.padding(
-                horizontal = 24.dp,
-                vertical = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-        ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}, contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "発注日設定", fontSize = 24.sp)
-            }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}, contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "納品日指定発注", fontSize = 24.sp)
-            }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}, contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "納品日指定発注一覧", fontSize = 24.sp)
-            }
-            HorizontalDivider(thickness = 2.dp)
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {}, contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "発注データ送信", fontSize = 24.sp)
-            }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {showDialog = true},
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "マスターデータ受信", fontSize = 24.sp)
-            }
-
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text =
-                    """
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text =
+                """
                     You have pressed the floating action button $presses times.
                 """.trimIndent(),
-            )
-        }
+        )
     }
     if (showDialog) {
         AlertDialog(
@@ -226,6 +152,76 @@ fun ScaffoldExample() {
 
 @Preview(showBackground = true)
 @Composable
+fun OrderMenuPreview() {
+    OrderMenu(99)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScaffoldExample() {
+    var presses by remember { mutableIntStateOf(0) }
+    var showDialog by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf("Result") }
+
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text("商品管理アプリ")
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "Bottom app bar",
+                )
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { presses++ }) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        },
+        content = { innerPadding -> OrderMenu(presses) }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
 fun ScaffoldExamplePreview() {
     ScaffoldExample()
+}
+
+//object Route {
+//    @SerializableLambda
+//    data object Menu
+//}
+
+@Composable
+fun MyAppNavHost(
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = "home"
+) {
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("home") {
+            Greeting()
+        }
+    }
+}
+
+@Composable
+fun Greeting() {
+    Text("あいうえお")
 }
