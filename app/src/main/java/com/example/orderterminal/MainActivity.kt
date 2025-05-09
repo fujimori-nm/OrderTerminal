@@ -39,12 +39,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 //import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.orderterminal.ui.theme.OrderTerminalTheme
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,8 +62,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OrderMenu(
+    navController: NavController,
     presses: Int,
-    ) {
+) {
 //    var presses by remember { mutableIntStateOf(0) }
     var showDialog by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf("Result") }
@@ -70,12 +73,16 @@ fun OrderMenu(
 //            modifier = Modifier.padding(innerPadding),
         modifier = Modifier.padding(
             horizontal = 24.dp,
-            vertical = 80.dp),
+            vertical = 80.dp
+        ),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = {}, contentPadding = PaddingValues(8.dp)
+            onClick = {
+                navController.navigate(Route.SecondPage)
+            },
+            contentPadding = PaddingValues(8.dp)
         ) {
             Text(text = "発注日設定", fontSize = 24.sp)
         }
@@ -100,7 +107,7 @@ fun OrderMenu(
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = {showDialog = true},
+            onClick = { showDialog = true },
             contentPadding = PaddingValues(8.dp)
         ) {
             Text(text = "マスターデータ受信", fontSize = 24.sp)
@@ -153,15 +160,14 @@ fun OrderMenu(
 @Preview(showBackground = true)
 @Composable
 fun OrderMenuPreview() {
-    OrderMenu(99)
+    val navController = rememberNavController()
+    OrderMenu(navController, presses = 99)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScaffoldExample() {
     var presses by remember { mutableIntStateOf(0) }
-    var showDialog by remember { mutableStateOf(false) }
-    var result by remember { mutableStateOf("Result") }
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
@@ -194,7 +200,8 @@ fun ScaffoldExample() {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         },
-        content = { innerPadding -> OrderMenu(presses) }
+//        content = { innerPadding -> OrderMenu(presses) }
+        content = { innerPadding -> AppNavHost(presses) }
     )
 }
 
@@ -204,24 +211,61 @@ fun ScaffoldExamplePreview() {
     ScaffoldExample()
 }
 
-//object Route {
-//    @SerializableLambda
-//    data object Menu
-//}
+object Route {
+    @Serializable
+    data object Menu
+
+    @Serializable
+    data object SecondPage
+//    data class SecondPage (
+//        val name: String
+//    )
+}
 
 @Composable
-fun MyAppNavHost(
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = "home"
-) {
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable("home") {
-            Greeting()
+fun AppNavHost(presses: Int,) {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = Route.Menu
+    ) {
+        composable<Route.Menu> {
+            OrderMenu(
+                navController,
+                presses
+            )
+        }
+        composable<Route.SecondPage> {
+            Greeting(
+                navController
+            )
         }
     }
 }
 
 @Composable
-fun Greeting() {
-    Text("あいうえお")
+fun Greeting(navController: NavController) {
+    Column(
+        modifier = Modifier.padding(
+            horizontal = 24.dp,
+            vertical = 80.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+    ) {
+        Text("あいうえお")
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { navController.navigate(Route.Menu) },
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            Text(text = "戻る", fontSize = 24.sp)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    val navController = rememberNavController()
+    Greeting(navController)
 }
