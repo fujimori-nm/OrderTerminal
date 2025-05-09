@@ -45,10 +45,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.orderterminal.db.RoomApplication
 import com.example.orderterminal.ui.theme.OrderTerminalTheme
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
+
+    private val dao = RoomApplication.database.itemDao()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -269,3 +273,4 @@ fun GreetingPreview() {
     val navController = rememberNavController()
     Greeting(navController)
 }
+
