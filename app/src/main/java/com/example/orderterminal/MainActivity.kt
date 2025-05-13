@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -88,19 +92,19 @@ fun OrderMenu(
             },
             contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "発注日設定", fontSize = 24.sp)
+            Text(text = "発注（納品日設定）", fontSize = 24.sp)
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {}, contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "納品日指定発注", fontSize = 24.sp)
+            Text(text = "発注一覧（納品日設定）", fontSize = 24.sp)
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {}, contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "納品日指定発注一覧", fontSize = 24.sp)
+            Text(text = "他メニュー１", fontSize = 24.sp)
         }
         HorizontalDivider(thickness = 2.dp)
         Button(
@@ -121,7 +125,7 @@ fun OrderMenu(
             modifier = Modifier.padding(8.dp),
             text =
                 """
-                    You have pressed the floating action button $presses times.
+                    動作検証用文字列 $presses times.
                 """.trimIndent(),
         )
     }
@@ -173,7 +177,7 @@ fun OrderMenuPreview() {
 fun ScaffoldExample() {
     var presses by remember { mutableIntStateOf(0) }
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+//    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
         topBar = {
             TopAppBar(
@@ -191,12 +195,21 @@ fun ScaffoldExample() {
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Bottom app bar",
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ){
+                    Icon(
+                        Icons.Filled.Home,
+                        modifier = Modifier.size(48.dp),
+                        contentDescription = "Home"
+                    )
+                    Icon(
+                        Icons.Filled.Settings,
+                        modifier = Modifier.size(48.dp),
+                        contentDescription = "Settings"
+                    )
+                }
             }
         },
         floatingActionButton = {
@@ -205,7 +218,7 @@ fun ScaffoldExample() {
             }
         },
 //        content = { innerPadding -> OrderMenu(presses) }
-        content = { innerPadding -> AppNavHost(presses) }
+        content = { innerPadding -> AppNavHost(innerPadding, presses) }
     )
 }
 
@@ -227,7 +240,7 @@ object Route {
 }
 
 @Composable
-fun AppNavHost(presses: Int,) {
+fun AppNavHost(innerPadding: PaddingValues, presses: Int) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
