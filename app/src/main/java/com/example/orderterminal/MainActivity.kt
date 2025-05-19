@@ -1,11 +1,9 @@
 package com.example.orderterminal
 
-import android.R.attr.onClick
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,20 +14,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -40,18 +36,16 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-//import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -65,46 +59,42 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-//            OrderMenu()
-            ScaffoldExample()
+            // メインコンテンツの呼出は、AppScaffold＞AppHostNav＞メインコンテンツ
+            AppScaffold()
         }
-        Log.v("TAG", "Hello, world!")
+        Log.v("アプリ", "onCreate End")
     }
 }
 
 @Composable
 fun OrderMenu(
+    innerPadding: PaddingValues,
     navController: NavController,
-    presses: Int,
 ) {
-//    var presses by remember { mutableIntStateOf(0) }
-    var showDialog by remember { mutableStateOf(false) }
-    var result by remember { mutableStateOf("Result") }
-
     Column(
-//            modifier = Modifier.padding(innerPadding),
-        modifier = Modifier.padding(
-            horizontal = 24.dp,
-            vertical = 80.dp
-        ),
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(
+                horizontal = 24.dp,
+                vertical = 24.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                navController.navigate(Route.SecondPage)
+                navController.navigate(Route.OrderDateSetting)
             },
             contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "発注（納品日設定）", fontSize = 24.sp)
+            Text(text = "発注（納品日指定）", fontSize = 24.sp)
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {}, contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "発注一覧（納品日設定）", fontSize = 24.sp)
+            Text(text = "発注一覧（納品日指定）", fontSize = 24.sp)
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -124,53 +114,11 @@ fun OrderMenu(
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { showDialog = true },
+            onClick = {},
             contentPadding = PaddingValues(8.dp)
         ) {
             Text(text = "マスターデータ受信", fontSize = 24.sp)
         }
-
-        Text(
-            modifier = Modifier.padding(8.dp),
-            text =
-                """
-                    動作検証用文字列 $presses times.
-                """.trimIndent(),
-        )
-    }
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                result = "Dismiss"
-                showDialog = false
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        result = "OK"
-                        showDialog = false
-                    }
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        result = "Cancel"
-                        showDialog = false
-                    }
-                ) {
-                    Text("Cancel")
-                }
-            },
-            title = {
-                Text("AlertDialog")
-            },
-            text = {
-                Text("これはJetpack Composeのダイアログです。Material3デザインに対応しています。")
-            },
-        )
     }
 }
 
@@ -178,15 +126,15 @@ fun OrderMenu(
 @Composable
 fun OrderMenuPreview() {
     val navController = rememberNavController()
-    OrderMenu(navController, presses = 99)
+    val innerPadding = PaddingValues(8.dp)
+    OrderMenu(innerPadding, navController)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScaffoldExample() {
-    var presses by remember { mutableIntStateOf(0) }
+fun AppScaffold() {
+    val onHomeClick: (NavHostController) -> Unit = {nvc:NavHostController -> nvc.navigate(Route.Menu)}
 
-//    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
         topBar = {
             TopAppBar(
@@ -207,12 +155,18 @@ fun ScaffoldExample() {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
-                ){
-                    Icon(
-                        Icons.Filled.Home,
-                        modifier = Modifier.size(48.dp),
-                        contentDescription = "Home"
-                    )
+                ) {
+                    IconButton(onClick = {
+                    },
+//                        ToDo メニュー画面の時は非活性
+//                        enabled = false
+                    ) {
+                        Icon(
+                            Icons.Filled.Home,
+                            modifier = Modifier.size(48.dp),
+                            contentDescription = "Home"
+                        )
+                    }
                     Icon(
                         Icons.Filled.Settings,
                         modifier = Modifier.size(48.dp),
@@ -221,20 +175,15 @@ fun ScaffoldExample() {
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        },
-//        content = { innerPadding -> OrderMenu(presses) }
-        content = { innerPadding -> AppNavHost(innerPadding, presses) }
-    )
+//        floatingActionButton = {}
+        // メインコンテンツ
+    ) { innerPadding -> AppNavHost(innerPadding)}
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ScaffoldExamplePreview() {
-    ScaffoldExample()
+fun AppScaffoldPreview() {
+    AppScaffold()
 }
 
 object Route {
@@ -242,16 +191,16 @@ object Route {
     data object Menu
 
     @Serializable
-    data object SecondPage
-//    data class SecondPage (
-//        val name: String
-//    )
+    data object OrderDateSetting
+
     @Serializable
     data object Greeting
 }
 
 @Composable
-fun AppNavHost(innerPadding: PaddingValues, presses: Int) {
+fun AppNavHost(
+    innerPadding: PaddingValues,
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -259,13 +208,14 @@ fun AppNavHost(innerPadding: PaddingValues, presses: Int) {
     ) {
         composable<Route.Menu> {
             OrderMenu(
+                innerPadding,
                 navController,
-                presses
             )
         }
-        composable<Route.SecondPage> {
+        composable<Route.OrderDateSetting> {
             OrderDateSetting(
-                navController
+                innerPadding,
+                navController,
             )
         }
         composable<Route.Greeting> {
@@ -275,14 +225,18 @@ fun AppNavHost(innerPadding: PaddingValues, presses: Int) {
         }
     }
 }
+
 // 便指定の定義
 enum class Trucking(val labelText: String) {
     Unspecified("指定なし"), First("1便"), Second("2便"), Third("3便")
 }
 
-
+// 発注日、便指定画面
 @Composable
-fun OrderDateSetting(navController: NavController) {
+fun OrderDateSetting(
+    innerPadding: PaddingValues,
+    navController: NavController,
+) {
     var orderDate: String by remember { mutableStateOf(LocalDate.now().toString()) }
     var showDateDialog: Boolean by remember { mutableStateOf(false) }
 
@@ -291,10 +245,12 @@ fun OrderDateSetting(navController: NavController) {
     }
 
     Column(
-        modifier = Modifier.padding(
-            horizontal = 24.dp,
-            vertical = 80.dp
-        ),
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(
+                horizontal = 24.dp,
+                vertical = 24.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Box {
@@ -313,10 +269,10 @@ fun OrderDateSetting(navController: NavController) {
                     }
             )
         }
-        if(showDateDialog) {
+        if (showDateDialog) {
             DatePickerModal(
                 onDateSelected = {},
-                onDismiss = {showDateDialog = false}
+                onDismiss = { showDateDialog = false }
             )
         }
         Column {
@@ -349,10 +305,10 @@ fun OrderDateSetting(navController: NavController) {
         Text("")
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(Route.Menu) },
+            onClick = {},
             contentPadding = PaddingValues(8.dp)
         ) {
-            Text(text = "納品日設定へ", fontSize = 24.sp)
+            Text(text = "納品数設定へ", fontSize = 24.sp)
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -406,7 +362,9 @@ fun DatePickerModal(
 @Composable
 fun OrderDateSettingPreview() {
     val navController = rememberNavController()
-    OrderDateSetting(navController)
+    val innerPadding = PaddingValues(8.dp)
+
+    OrderDateSetting(innerPadding, navController)
 }
 
 @Composable
