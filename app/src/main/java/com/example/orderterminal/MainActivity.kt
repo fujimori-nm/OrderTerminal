@@ -4,14 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.Scanner
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -47,9 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -164,9 +168,10 @@ fun AppScaffold(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    IconButton(onClick = {
-                        navController.navigate(Route.Menu)
-                    },
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Route.Menu)
+                        },
 //                        ToDo メニュー画面の時は非活性
 //                        enabled = false
                     ) {
@@ -186,7 +191,7 @@ fun AppScaffold(
         },
 //        floatingActionButton = {}
         // メインコンテンツ
-    ) { innerPadding -> AppNavHost(innerPadding,navController= navController)}
+    ) { innerPadding -> AppNavHost(innerPadding, navController = navController) }
 }
 
 @Preview(showBackground = true)
@@ -321,20 +326,19 @@ fun OrderDateSetting(
                 }
             }
         }
-        Text("")
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = {navController.navigate(Route.OrderSetting)},
+            onClick = { navController.navigate(Route.OrderSetting) },
             contentPadding = PaddingValues(8.dp)
         ) {
             Text(text = "納品数設定へ", fontSize = 24.sp)
         }
         Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(Route.Menu) },
-            contentPadding = PaddingValues(8.dp)
+            modifier = Modifier.align(Alignment.End),
+            onClick = {},
+            contentPadding = PaddingValues(16.dp, 8.dp)
         ) {
-            Text(text = "戻る", fontSize = 24.sp)
+            Text(text = "発注一覧", fontSize = 16.sp)
         }
     }
 }
@@ -382,7 +386,6 @@ fun DatePickerModal(
 fun OrderDateSettingPreview() {
     val navController = rememberNavController()
     val innerPadding = PaddingValues(8.dp)
-
     OrderDateSetting(innerPadding, navController)
 }
 
@@ -403,6 +406,17 @@ fun OrderSetting(
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        Row {
+            Text(
+                text = "発注日：2025-02-20",
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "便指定：指定なし",
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         OutlinedTextField(
             value = code,
             onValueChange = { code = it },
@@ -412,101 +426,203 @@ fun OrderSetting(
                     Icons.Filled.QrCodeScanner,
                     modifier = Modifier.size(48.dp),
                     contentDescription = "Settings"
-                    )
+                )
             }
         )
-        Row{
-            Text(
-                text = "名称",
-                modifier =  Modifier.width(50.dp)
-            )
-            Text("はごろも　シーチキンL")
-        }
-        Row{
-            Text(
-                text = "規格",
-                modifier =  Modifier.width(50.dp)
-            )
-            Text("１４０ｇ")
-        }
-        Row(
-            horizontalArrangement = Arrangement.Start
-        ){
-            Text(
-                text="在庫数",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text = "13.0",
-                fontSize = 16.sp,
-            )
-        }
-        Row{
-            Text(
-                text="売価",
-                modifier =  Modifier
-                    .width(60.dp)
-            )
-            Text(
-                text = "408",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-
-            )
-            Text(
-                text="原価",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text="296.0",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-            )
-        }
-        Row{
-            Text(
-                text="発注単位",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text = "5",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-
+        Column(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row {
+                Text(
+                    text = "名称",
+                    modifier = Modifier.width(50.dp),
+                    color = MaterialTheme.colorScheme.primary
                 )
-            Text(
-                text="入数",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text="120",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-            )
-        }
-        Row{
-            Text(
-                text="平日日販",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text = "8",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-
+                Text("はごろも　シーチキンL")
+            }
+            Row {
+                Text(
+                    text = "規格",
+                    modifier = Modifier.width(50.dp),
+                    color = MaterialTheme.colorScheme.primary
                 )
-            Text(
-                text="土日日販",
-                modifier =  Modifier.width(60.dp)
-            )
-            Text(
-                text="10",
-                modifier =  Modifier.width(60.dp).wrapContentSize(Alignment.Center),
-                fontSize = 16.sp,
-            )
+                Text("１４０ｇ")
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "在庫数",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "13.0",
+                    fontSize = 16.sp,
+                )
+            }
+            Row {
+                Text(
+                    text = "売価",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "408",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+
+                    )
+                Text(
+                    text = "原価",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "296.0",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+                )
+            }
+            Row {
+                Text(
+                    text = "発注単位",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "5",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+
+                    )
+                Text(
+                    text = "入数",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "120",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+                )
+            }
+            Row {
+                Text(
+                    text = "平日日販",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "8",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+
+                    )
+                Text(
+                    text = "土日日販",
+                    modifier = Modifier.width(60.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "10",
+                    modifier = Modifier
+                        .width(60.dp)
+                        .wrapContentSize(Alignment.Center),
+                    fontSize = 16.sp,
+                )
+            }
         }
+        //ここから表
+        Text("納品数設定表")
+        val colWidth = 40.dp
+        val day:Int = LocalDate.now().dayOfMonth
+        val days:List<Int> = (day+1..day+7).toList()
+        val daysAsStr:List<String> = days.map {it.toString()}
+        var dayTitles: MutableList<String> = mutableListOf("")
+        val rowTitles: List<String> = listOf("1便","2便","3便","売","性",)
+        dayTitles.addAll(daysAsStr)
+        Column(
+        ) {
+            Row(
+                modifier = Modifier.background(Color(0xFFCCC2DC))
+            ) {
+                for (title in dayTitles) {
+                    TableCell(text = title, width = colWidth)
+                }
+            }
+            for (rowTitle in rowTitles) {
+                Row(
+                ) {
+                    TableRowTitleCell(text = rowTitle, width = colWidth)
+                    for (i in 1..7) {
+                        TableCell(text = "999", width = colWidth)
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { navController.navigate(Route.OrderSetting) },
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            Text(text = "納品数確定", fontSize = 24.sp)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            modifier = Modifier.align(Alignment.End),
+            onClick = {},
+            contentPadding = PaddingValues(16.dp, 8.dp)
+        ) {
+            Text(text = "発注一覧", fontSize = 16.sp)
+        }
+
     }
 }
+
+
+
+@Composable
+fun RowScope.TableCell(
+    text: String,
+    width: Dp,
+) {
+    Text(
+        text = text,
+        Modifier
+            .border(1.dp, Color.Black)
+            .width(width)
+            .padding(8.dp)
+    )
+}
+
+@Composable
+fun RowScope.TableRowTitleCell(
+    text: String,
+    width: Dp,
+) {
+    Text(
+        text = text,
+        Modifier
+            .background(Color(0xFFCCC2DC))
+            .border(1.dp, Color.Black)
+            .width(width)
+            .padding(8.dp)
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -516,8 +632,6 @@ fun OrderSettingPreview() {
 
     OrderSetting(innerPadding, navController)
 }
-
-
 
 
 @Composable
