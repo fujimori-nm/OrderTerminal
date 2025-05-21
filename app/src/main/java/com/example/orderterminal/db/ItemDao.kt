@@ -6,18 +6,22 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemDao {
     @Query("select * from items order by code asc")
-    fun getAll(): MutableList<Item>
+    fun getAll(): Flow<List<Item>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun post(item: Item)
+    @Query("select * from items where items.code==:code ")
+    suspend fun getItemByCode(code:String): Item
+
+    @Insert
+    suspend fun insert(item: Item)
 
     @Delete
-    fun delete(item: Item)
+    suspend fun delete(item: Item)
 
     @Update
-    fun update(item: Item)
+    suspend fun update(item: Item)
 }

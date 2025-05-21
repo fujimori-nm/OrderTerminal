@@ -46,12 +46,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,19 +61,46 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.orderterminal.db.Item
 import com.example.orderterminal.db.RoomApplication
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
-
-    private val dao = RoomApplication.database.itemDao()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             // メインコンテンツの呼出は、AppScaffold＞AppHostNav＞メインコンテンツ
             AppScaffold()
+
+            // ボタンを押すと1レコード登録される仮実装
+            val coroutineScope = rememberCoroutineScope()
+            val app = application as RoomApplication
+            val db = app.container.itemRepository
+            val item = Item(
+                code = "123457",
+                name = "テスト商品",
+                notes = "テスト規格",
+                stock = 11.1F,
+                cost = 22.2F,
+                sale = 33,
+                weekdaySales = 44,
+                holidaySales = 55
+            )
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    coroutineScope.launch {
+                        db.insertItem(item)
+                    }
+                },
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                Text(text = "DB登録", fontSize = 24.sp)
+            }
+            // 仮実装END
         }
         Log.v("アプリ", "onCreate End")
     }
@@ -547,11 +574,11 @@ fun OrderSetting(
         //ここから表
         Text("納品数設定表")
         val colWidth = 40.dp
-        val day:Int = LocalDate.now().dayOfMonth
-        val days:List<Int> = (day+1..day+7).toList()
-        val daysAsStr:List<String> = days.map {it.toString()}
+        val day: Int = LocalDate.now().dayOfMonth
+        val days: List<Int> = (day + 1..day + 7).toList()
+        val daysAsStr: List<String> = days.map { it.toString() }
         var dayTitles: MutableList<String> = mutableListOf("")
-        val rowTitles: List<String> = listOf("1便","2便","3便","売","性",)
+        val rowTitles: List<String> = listOf("1便", "2便", "3便", "売", "性")
         dayTitles.addAll(daysAsStr)
         Column(
         ) {
@@ -591,7 +618,6 @@ fun OrderSetting(
 
     }
 }
-
 
 
 @Composable
