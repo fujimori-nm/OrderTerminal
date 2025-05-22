@@ -69,34 +69,14 @@ import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // メインコンテンツの呼出は、AppScaffold＞AppHostNav＞メインコンテンツ
-            AppScaffold()
-
-            // ボタンを押すと1レコード登録される仮実装
-            val coroutineScope = rememberCoroutineScope()
             val app = application as RoomApplication
-            val db = app.container.itemRepository
-            val item = Item(
-                code = "123457",
-                name = "テスト商品",
-                notes = "テスト規格",
-                sale = 33,
-            )
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    coroutineScope.launch {
-                        db.insertItem(item)
-                    }
-                },
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                Text(text = "DB登録", fontSize = 24.sp)
-            }
-            // 仮実装END
+            // メインコンテンツの呼出は、AppScaffold＞AppHostNav＞メインコンテンツ
+            AppScaffold(app)
         }
         Log.v("アプリ", "onCreate End")
     }
@@ -168,6 +148,7 @@ fun OrderMenuPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
+    app: RoomApplication
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -214,13 +195,14 @@ fun AppScaffold(
         },
 //        floatingActionButton = {}
         // メインコンテンツ
-    ) { innerPadding -> AppNavHost(innerPadding, navController = navController) }
+    ) { innerPadding -> AppNavHost(innerPadding, navController = navController,app) }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AppScaffoldPreview() {
-    AppScaffold()
+    val app = RoomApplication()
+    AppScaffold(app)
 }
 
 object Route {
@@ -241,6 +223,7 @@ object Route {
 fun AppNavHost(
     innerPadding: PaddingValues,
     navController: NavHostController,
+    app: RoomApplication,
 ) {
 //    val navController = rememberNavController()
     NavHost(
@@ -267,7 +250,8 @@ fun AppNavHost(
         }
         composable<Route.Greeting> {
             Greeting(
-                navController
+                navController,
+                app
             )
         }
     }
@@ -657,7 +641,7 @@ fun OrderSettingPreview() {
 
 
 @Composable
-fun Greeting(navController: NavController) {
+fun Greeting(navController: NavController,app: RoomApplication) {
     Column(
         modifier = Modifier.padding(
             horizontal = 24.dp,
@@ -673,12 +657,36 @@ fun Greeting(navController: NavController) {
         ) {
             Text(text = "戻る", fontSize = 24.sp)
         }
+        // ボタンを押すと1レコード登録される仮実装
+        val coroutineScope = rememberCoroutineScope()
+//    val app = application as RoomApplication
+        val db = app.container.itemRepository
+        val item = Item(
+            code = "123457",
+            name = "テスト商品",
+            notes = "テスト規格",
+            sale = 33,
+        )
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                coroutineScope.launch {
+                    db.insertItem(item)
+                }
+            },
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            Text(text = "DB登録", fontSize = 24.sp)
+        }
+        // 仮実装END
     }
+
 }
 
 //@Preview(showBackground = true)
 //@Composable
 //fun GreetingPreview() {
 //    val navController = rememberNavController()
-//    Greeting(navController)
+//    val app = RoomApplication()
+//    Greeting(navController,app)
 //}
