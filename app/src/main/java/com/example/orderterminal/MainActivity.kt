@@ -83,11 +83,7 @@ class MainActivity : ComponentActivity() {
                 code = "123457",
                 name = "テスト商品",
                 notes = "テスト規格",
-                stock = 11.1F,
-                cost = 22.2F,
                 sale = 33,
-                weekdaySales = 44,
-                holidaySales = 55
             )
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -593,7 +589,7 @@ fun OrderSetting(
                 Row(
                 ) {
                     TableRowTitleCell(text = rowTitle, width = colWidth)
-                    for (i in 1..7) {
+                    repeat(7) {
                         TableCell(text = "999", width = colWidth)
                     }
                 }

@@ -14,7 +14,7 @@ interface ItemDao {
     fun getAll(): Flow<List<Item>>
 
     @Query("select * from items where items.code==:code ")
-    suspend fun getItemByCode(code:String): Item
+    fun getItemByCode(code:String): Flow<Item>
 
     @Insert
     suspend fun insert(item: Item)

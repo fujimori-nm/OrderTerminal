@@ -1,9 +1,6 @@
 package com.example.orderterminal.db
 
-import android.health.connect.datatypes.SkinTemperatureRecord
-import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -14,14 +11,14 @@ import androidx.room.PrimaryKey
 data class Item(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val code: String,
-    val name: String,
-    val notes: String,
-    val stock: Float,
-    val cost: Float,
-    val sale: Int,
-    @ColumnInfo(name = "weekday_sales")
-    val weekdaySales: Int,
-    @ColumnInfo(name = "holiday_sales")
-    val holidaySales: Int,
+    val code: String = "",
+    val name: String = "",
+    val notes: String = "",
+//    val stock: Float,
+//    val cost: Float,
+    val sale: Int = 0,
+//    @ColumnInfo(name = "weekday_sales")
+//    val weekdaySales: Int,
+//    @ColumnInfo(name = "holiday_sales")
+//    val holidaySales: Int,
 )

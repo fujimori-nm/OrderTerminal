@@ -4,7 +4,7 @@ class ItemRepository(private val itemDao: ItemDao) {
 
     fun gatAllItems() = itemDao.getAll()
 
-    suspend fun getItemByCode(code: String) = itemDao.getItemByCode(code)
+    fun getItemByCode(code: String) = itemDao.getItemByCode(code)
 
     suspend fun insertItem(item: Item) = itemDao.insert(item)
 
