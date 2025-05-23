@@ -105,8 +105,6 @@ ui.画面名のパッケージ内にはViewModelも格納する予定
     └── MainActivity.kt
 ```
 
-![img.png](img.png)
-
 #### ソース外で修正したファイル
 
 ##### libs.versions.toml,build.gradle.kts
