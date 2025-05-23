@@ -90,7 +90,8 @@ ui.画面名のパッケージ内にはViewModelも格納する予定
 現在は、DBへのインサート処理を記述
 
 パッケージ構成図
-```
+
+```auto
 .
 └── com.exsample.orderterminal
     ├── db
@@ -103,6 +104,9 @@ ui.画面名のパッケージ内にはViewModelも格納する予定
     │   └── tryout
     └── MainActivity.kt
 ```
+
+![img.png](img.png)
+
 #### ソース外で修正したファイル
 
 ##### libs.versions.toml,build.gradle.kts
