@@ -6,350 +6,106 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.orderterminal.db.Item
 import com.example.orderterminal.db.RoomApplication
-import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-import java.time.LocalDate
+import com.example.orderterminal.navgation.AppNavHost
+import com.example.orderterminal.navgation.Route
 
 class MainActivity : ComponentActivity() {
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val app = application as RoomApplication
-            // メインコンテンツの呼出は、AppScaffold＞AppHostNav＞メインコンテンツ
-            AppScaffold(app)
+            // 検証用のTryOutScreeでDB検証の為にappを渡している（削除予定）
+            AppNavHost(app)
         }
         Log.v("アプリ", "onCreate End")
     }
 }
 
-@Composable
-fun OrderMenu(
-    innerPadding: PaddingValues,
-    navController: NavController,
-) {
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .padding(
-                horizontal = 24.dp,
-                vertical = 24.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                navController.navigate(Route.OrderDateSetting)
-            },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "発注（納品日指定）", fontSize = 24.sp)
-        }
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {}, contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "発注一覧（納品日指定）", fontSize = 24.sp)
-        }
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                navController.navigate(Route.Greeting)
-            },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "他メニュー１", fontSize = 24.sp)
-        }
-        HorizontalDivider(thickness = 2.dp)
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {}, contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "発注データ送信", fontSize = 24.sp)
-        }
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {},
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "マスターデータ受信", fontSize = 24.sp)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OrderMenuPreview() {
-    val navController = rememberNavController()
-    val innerPadding = PaddingValues(8.dp)
-    OrderMenu(innerPadding, navController)
-}
-
+// TopBarは共通の為ここに配置
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScaffold(
-    app: RoomApplication
-) {
-    val navController = rememberNavController()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("商品管理アプリ")
-                }
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(Route.Menu)
-                        },
-//                        ToDo メニュー画面の時は非活性
-//                        enabled = false
-                    ) {
-                        Icon(
-                            Icons.Filled.Home,
-                            modifier = Modifier.size(48.dp),
-                            contentDescription = "Home"
-                        )
-                    }
-                    Icon(
-                        Icons.Filled.Settings,
-                        modifier = Modifier.size(48.dp),
-                        contentDescription = "Settings"
-                    )
-                }
-            }
-        },
-//        floatingActionButton = {}
-        // メインコンテンツ
-    ) { innerPadding -> AppNavHost(innerPadding, navController = navController,app) }
+fun AppTopBar() {
+    TopAppBar(
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Text("商品管理アプリ")
+        }
+    )
 }
 
-@Preview(showBackground = true)
+// BottomBarはMenuScreen以外共通
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScaffoldPreview() {
-    val app = RoomApplication()
-    AppScaffold(app)
-}
-
-object Route {
-    @Serializable
-    data object Menu
-
-    @Serializable
-    data object OrderDateSetting
-
-    @Serializable
-    data object OrderSetting
-
-    @Serializable
-    data object Greeting
-}
-
-@Composable
-fun AppNavHost(
-    innerPadding: PaddingValues,
-    navController: NavHostController,
-    app: RoomApplication,
-) {
-//    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = Route.Menu
+fun AppBottomBar(navController: NavController) {
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        composable<Route.Menu> {
-            OrderMenu(
-                innerPadding,
-                navController,
-            )
-        }
-        composable<Route.OrderDateSetting> {
-            OrderDateSetting(
-                innerPadding,
-                navController,
-            )
-        }
-        composable<Route.OrderSetting> {
-            OrderSetting(
-                innerPadding,
-                navController
-            )
-        }
-        composable<Route.Greeting> {
-            Greeting(
-                navController,
-                app
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(
+                onClick = {
+                    navController.navigate(Route.Menu)
+                },
+            ) {
+                Icon(
+                    Icons.Filled.Home,
+                    modifier = Modifier.size(48.dp),
+                    contentDescription = "Home"
+                )
+            }
+            Icon(
+                Icons.Filled.Settings,
+                modifier = Modifier.size(48.dp),
+                contentDescription = "Settings"
             )
         }
     }
 }
 
-// 便指定の定義
+
+// 便指定の定義（OrderDateScreenに移植予定）
 enum class Trucking(val labelText: String) {
     Unspecified("指定なし"), First("1便"), Second("2便"), Third("3便")
 }
 
-// 発注日、便指定画面
-@Composable
-fun OrderDateSetting(
-    innerPadding: PaddingValues,
-    navController: NavController,
-) {
-    var orderDate: String by remember { mutableStateOf(LocalDate.now().toString()) }
-    var showDateDialog: Boolean by remember { mutableStateOf(false) }
-
-    var selectedFruit: Trucking by remember {
-        mutableStateOf(Trucking.Unspecified)
-    }
-
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .padding(
-                horizontal = 24.dp,
-                vertical = 24.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        Box {
-            OutlinedTextField(
-                value = orderDate,
-                onValueChange = { orderDate = it },
-                label = { Text("発注日") }
-            )
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .alpha(0f)
-                    .clickable {
-                        Log.v("TAG", LocalDate.now().toString())
-                        showDateDialog = true
-                    }
-            )
-        }
-        if (showDateDialog) {
-            DatePickerModal(
-                onDateSelected = {},
-                onDismiss = { showDateDialog = false }
-            )
-        }
-        Column {
-            Text(
-                text = "配送便指定",
-                modifier = Modifier
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp),
-                fontSize = 15.sp
-            )
-
-            Row {
-                Trucking.entries.forEach {
-                    FilterChip(
-                        modifier = Modifier.padding(8.dp),
-                        selected = it == selectedFruit,
-                        onClick = { selectedFruit = it },
-                        label = { Text(text = it.labelText) },
-                        leadingIcon = {
-                            if (it == selectedFruit) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        }
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(Route.OrderSetting) },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "納品数設定へ", fontSize = 24.sp)
-        }
-        Button(
-            modifier = Modifier.align(Alignment.End),
-            onClick = {},
-            contentPadding = PaddingValues(16.dp, 8.dp)
-        ) {
-            Text(text = "発注一覧", fontSize = 16.sp)
-        }
-    }
-}
-
+// 発注日の入力時に利用する日付入力ダイアログ
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -378,228 +134,8 @@ fun DatePickerModal(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DatePickerModalPreview() {
-//    DatePickerModal(
-//        onDateSelected = {},
-//        onDismiss = {}
-//    )
-//}
 
-
-@Preview(showBackground = true)
-@Composable
-fun OrderDateSettingPreview() {
-    val navController = rememberNavController()
-    val innerPadding = PaddingValues(8.dp)
-    OrderDateSetting(innerPadding, navController)
-}
-
-
-@Composable
-fun OrderSetting(
-    innerPadding: PaddingValues,
-    navController: NavController,
-) {
-    var code: String by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .padding(
-                horizontal = 24.dp,
-                vertical = 24.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Row {
-            Text(
-                text = "発注日：2025-02-20",
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = "便指定：指定なし",
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-        OutlinedTextField(
-            value = code,
-            onValueChange = { code = it },
-            label = { Text("商品コード") },
-            trailingIcon = {
-                Icon(
-                    Icons.Filled.QrCodeScanner,
-                    modifier = Modifier.size(48.dp),
-                    contentDescription = "Settings"
-                )
-            }
-        )
-        Column(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row {
-                Text(
-                    text = "名称",
-                    modifier = Modifier.width(50.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text("はごろも　シーチキンL")
-            }
-            Row {
-                Text(
-                    text = "規格",
-                    modifier = Modifier.width(50.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text("１４０ｇ")
-            }
-            Row(
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(
-                    text = "在庫数",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "13.0",
-                    fontSize = 16.sp,
-                )
-            }
-            Row {
-                Text(
-                    text = "売価",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "408",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-
-                    )
-                Text(
-                    text = "原価",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "296.0",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-                )
-            }
-            Row {
-                Text(
-                    text = "発注単位",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "5",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-
-                    )
-                Text(
-                    text = "入数",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "120",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-                )
-            }
-            Row {
-                Text(
-                    text = "平日日販",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "8",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-
-                    )
-                Text(
-                    text = "土日日販",
-                    modifier = Modifier.width(60.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = "10",
-                    modifier = Modifier
-                        .width(60.dp)
-                        .wrapContentSize(Alignment.Center),
-                    fontSize = 16.sp,
-                )
-            }
-        }
-        //ここから表
-        Text("納品数設定表")
-        val colWidth = 40.dp
-        val day: Int = LocalDate.now().dayOfMonth
-        val days: List<Int> = (day + 1..day + 7).toList()
-        val daysAsStr: List<String> = days.map { it.toString() }
-        var dayTitles: MutableList<String> = mutableListOf("")
-        val rowTitles: List<String> = listOf("1便", "2便", "3便", "売", "性")
-        dayTitles.addAll(daysAsStr)
-        Column(
-        ) {
-            Row(
-                modifier = Modifier.background(Color(0xFFCCC2DC))
-            ) {
-                for (title in dayTitles) {
-                    TableCell(text = title, width = colWidth)
-                }
-            }
-            for (rowTitle in rowTitles) {
-                Row(
-                ) {
-                    TableRowTitleCell(text = rowTitle, width = colWidth)
-                    repeat(7) {
-                        TableCell(text = "999", width = colWidth)
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(Route.OrderSetting) },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "納品数確定", fontSize = 24.sp)
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            modifier = Modifier.align(Alignment.End),
-            onClick = {},
-            contentPadding = PaddingValues(16.dp, 8.dp)
-        ) {
-            Text(text = "発注一覧", fontSize = 16.sp)
-        }
-
-    }
-}
-
-
+// 納品数入力表のセル
 @Composable
 fun RowScope.TableCell(
     text: String,
@@ -614,6 +150,7 @@ fun RowScope.TableCell(
     )
 }
 
+// 納品数入力表の背景色があるセル
 @Composable
 fun RowScope.TableRowTitleCell(
     text: String,
@@ -628,65 +165,3 @@ fun RowScope.TableRowTitleCell(
             .padding(8.dp)
     )
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun OrderSettingPreview() {
-    val navController = rememberNavController()
-    val innerPadding = PaddingValues(8.dp)
-
-    OrderSetting(innerPadding, navController)
-}
-
-
-@Composable
-fun Greeting(navController: NavController,app: RoomApplication) {
-    Column(
-        modifier = Modifier.padding(
-            horizontal = 24.dp,
-            vertical = 80.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        Text("あいうえお")
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(Route.Menu) },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "戻る", fontSize = 24.sp)
-        }
-        // ボタンを押すと1レコード登録される仮実装
-        val coroutineScope = rememberCoroutineScope()
-//    val app = application as RoomApplication
-        val db = app.container.itemRepository
-        val item = Item(
-            code = "123457",
-            name = "テスト商品",
-            notes = "テスト規格",
-            sale = 33,
-        )
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                coroutineScope.launch {
-                    db.insertItem(item)
-                }
-            },
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "DB登録", fontSize = 24.sp)
-        }
-        // 仮実装END
-    }
-
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    val navController = rememberNavController()
-//    val app = RoomApplication()
-//    Greeting(navController,app)
-//}
